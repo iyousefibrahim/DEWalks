@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using DEWalksAPI.Models.Domain;
+using Microsoft.EntityFrameworkCore;
 
 namespace DEWalksAPI.Data
 {
@@ -8,5 +9,9 @@ namespace DEWalksAPI.Data
         {
             
         }
+
+        public DbSet<Walk> Walks { get; set; }
+        public DbSet<Difficulty> Difficulties { get; set; }
+        public DbSet<Region> Regions { get; set; }
     }
 }
