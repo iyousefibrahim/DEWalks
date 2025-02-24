@@ -56,7 +56,7 @@ namespace DEWalksAPI.Controllers
             {
                 Id = region.Id,
                 Name = region.Name,
-                Code = region.Name,
+                Code = region.Code,
                 RegionImageUrl = region.RegionImageUrl
             };
 
