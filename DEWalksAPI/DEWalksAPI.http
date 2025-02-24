@@ -1,0 +1,6 @@
+@DEWalksAPI_HostAddress = http://localhost:5087
+
+GET {{DEWalksAPI_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
