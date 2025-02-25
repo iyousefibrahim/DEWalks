@@ -1,4 +1,6 @@
 using DEWalksAPI.Data;
+using DEWalksAPI.Repositories.Implementations;
+using DEWalksAPI.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -11,6 +13,9 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<DEWalksDbContext>(options =>
 options.UseSqlServer(builder.Configuration.GetConnectionString("DEWalksConnectionString")));
+
+
+builder.Services.AddScoped<IRegionRepository, SQLRegionRepository>();
 
 var app = builder.Build();
 
