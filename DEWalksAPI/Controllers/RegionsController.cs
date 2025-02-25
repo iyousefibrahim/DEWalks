@@ -3,6 +3,7 @@ using DEWalksAPI.Models.Domain;
 using DEWalksAPI.Models.DTO;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace DEWalksAPI.Controllers
 {
@@ -17,10 +18,10 @@ namespace DEWalksAPI.Controllers
         }
 
         [HttpGet]
-        public IActionResult GetAllRegions()
+        public async Task<IActionResult> GetAllRegions()
         {
             // Get Data From DataBase (Domain Model)
-            var regions = _Dbcontext.Regions.ToList();
+            var regions = await _Dbcontext.Regions.ToListAsync();
 
             // Map Domain Model to -> DTO
             var regionsDto = new List<RegionDto>();
@@ -42,10 +43,10 @@ namespace DEWalksAPI.Controllers
 
         [HttpGet]
         [Route("{Id:guid}")]
-        public IActionResult GetRegionById([FromRoute]Guid Id)
+        public async Task<IActionResult> GetRegionById([FromRoute]Guid Id)
         {
             // Get Data From DataBase (Domain Model)
-            var region = _Dbcontext.Regions.FirstOrDefault(r => r.Id == Id);
+            var region = await _Dbcontext.Regions.FirstOrDefaultAsync(r => r.Id == Id);
             if (region == null)
             {
                 return NotFound();
@@ -65,7 +66,7 @@ namespace DEWalksAPI.Controllers
         }
 
         [HttpPost]
-        public IActionResult CreateRegion([FromBody] AddRegionRequestDto addRegionRequestDto)
+        public async Task<IActionResult> CreateRegion([FromBody] AddRegionRequestDto addRegionRequestDto)
         {
             // Convert DTO To Domain Model
             var regionDomainModel = new Region
@@ -76,24 +77,26 @@ namespace DEWalksAPI.Controllers
             };
 
             // Save new record
-            _Dbcontext.Regions.Add(regionDomainModel);
-            _Dbcontext.SaveChanges();
+            await _Dbcontext.Regions.AddAsync(regionDomainModel);
+            await _Dbcontext.SaveChangesAsync();
 
             // Back To DTO
             var regionDto = new RegionDto
             {
                 Id = regionDomainModel.Id,
                 Name = regionDomainModel.Name,
+                Code = regionDomainModel.Code,
                 RegionImageUrl = regionDomainModel.RegionImageUrl
             };
+
             return StatusCode(201, regionDto);
         }
 
         [Route("{Id:guid}")]
         [HttpPut]
-        public IActionResult UpdateRegionById([FromRoute]Guid Id, [FromBody]UpdateRegionRequestDto updateRegionRequestDto)
+        public async Task<IActionResult> UpdateRegionById([FromRoute]Guid Id, [FromBody]UpdateRegionRequestDto updateRegionRequestDto)
         {
-            var regionDomainModel = _Dbcontext.Regions.FirstOrDefault(r => r.Id == Id);
+            var regionDomainModel = await _Dbcontext.Regions.FirstOrDefaultAsync(r => r.Id == Id);
             if(regionDomainModel == null)
             {
                 return NotFound();
@@ -102,22 +105,24 @@ namespace DEWalksAPI.Controllers
             regionDomainModel.Name = updateRegionRequestDto.Name;
             regionDomainModel.Code = updateRegionRequestDto.Code;
             regionDomainModel.RegionImageUrl = updateRegionRequestDto.RegionImageUrl;
-            _Dbcontext.SaveChanges();
+            await _Dbcontext.SaveChangesAsync();
 
             // Convert Domain Model To DTO
             var regionDto = new RegionDto {
+                Id = regionDomainModel.Id,
                 Name = regionDomainModel.Name,
                 Code = regionDomainModel.Code,
                 RegionImageUrl = regionDomainModel.RegionImageUrl
             };
+
             return Ok(regionDto);
         }
 
         [Route("{Id:guid}")]
         [HttpDelete]
-        public IActionResult DeleteRegionById([FromRoute] Guid Id)
+        public async Task<IActionResult> DeleteRegionById([FromRoute] Guid Id)
         {
-            var regionModel = _Dbcontext.Regions.FirstOrDefault(r => r.Id == Id);
+            var regionModel = await _Dbcontext.Regions.FirstOrDefaultAsync(r => r.Id == Id);
 
             if(regionModel == null)
             {
@@ -125,7 +130,7 @@ namespace DEWalksAPI.Controllers
             }
 
             _Dbcontext.Regions.Remove(regionModel);
-            _Dbcontext.SaveChanges();
+            await _Dbcontext.SaveChangesAsync();
 
             // Map regionModel To DTO
             var resgionDto = new RegionDto { 
