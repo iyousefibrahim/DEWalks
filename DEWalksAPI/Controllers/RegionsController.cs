@@ -1,4 +1,5 @@
-﻿using DEWalksAPI.Data;
+﻿using AutoMapper;
+using DEWalksAPI.Data;
 using DEWalksAPI.Models.Domain;
 using DEWalksAPI.Models.DTO;
 using DEWalksAPI.Repositories.Interfaces;
@@ -13,31 +14,24 @@ namespace DEWalksAPI.Controllers
     public class RegionsController : ControllerBase
     {
         private readonly IRegionRepository regionRepository;
-        public RegionsController(IRegionRepository regionRepository)
+        private readonly IMapper mapper;
+
+        public RegionsController(IRegionRepository regionRepository,IMapper mapper)
         {
             this.regionRepository = regionRepository;
+            this.mapper = mapper;
         }
 
         [HttpGet]
         public async Task<IActionResult> GetAllRegionsAsync()
         {
             var regionDomain = await regionRepository.GetAllRegionsAsync();
-            // Map Domain Model to -> DTO
-            var regionsDto = new List<RegionDto>();
 
-            foreach (var item in regionDomain)
-            {
-                regionsDto.Add(new RegionDto
-                {
-                    Id = item.Id,
-                    Name = item.Name,
-                    Code = item.Code,
-                    RegionImageUrl = item.RegionImageUrl
-                });
-            }
-
+            // Map Domain Models to -> DTOs
+            var regionDto = mapper.Map<List<RegionDto>>(regionDomain);
+            
             // Return DTO
-            return Ok(regionsDto);
+            return Ok(regionDto);
         }
 
         [HttpGet]
@@ -45,20 +39,14 @@ namespace DEWalksAPI.Controllers
         public async Task<IActionResult> GetRegionByIdAsync([FromRoute]Guid Id)
         {
             // Get Data From DataBase (Domain Model)
-            var region = await regionRepository.GetRegionByIdAsync(Id);
-            if (region == null)
+            var regionDomain = await regionRepository.GetRegionByIdAsync(Id);
+            if (regionDomain == null)
             {
                 return NotFound();
             }
 
-            // Map Domain Model to -> DTO
-            var regionsDto = new RegionDto
-            {
-                Id = region.Id,
-                Name = region.Name,
-                Code = region.Code,
-                RegionImageUrl = region.RegionImageUrl
-            };
+            // Map Domain Model to DTO
+            var regionsDto = mapper.Map<RegionDto>(regionDomain);
 
             // Return DTO
             return Ok(regionsDto);
@@ -67,25 +55,14 @@ namespace DEWalksAPI.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateRegionAsync([FromBody] AddRegionRequestDto addRegionRequestDto)
         {
-            // Convert DTO To Domain Model
-            var regionDomainModel = new Region
-            {
-                Name = addRegionRequestDto.Name,
-                Code = addRegionRequestDto.Code,
-                RegionImageUrl = addRegionRequestDto.RegionImageUrl
-            };
+            // Map DTO To Domain Model
+            var regionDomainModel = mapper.Map<Region>(addRegionRequestDto);
 
             // Save new record
             regionDomainModel = await regionRepository.CreateRegionAsync(regionDomainModel);
 
-            // Back To DTO
-            var regionDto = new RegionDto
-            {
-                Id = regionDomainModel.Id,
-                Name = regionDomainModel.Name,
-                Code = regionDomainModel.Code,
-                RegionImageUrl = regionDomainModel.RegionImageUrl
-            };
+            // Map Domain Model To DTO
+            var regionDto = mapper.Map<RegionDto>(regionDomainModel);
 
             return StatusCode(201, regionDto);
         }
@@ -96,12 +73,7 @@ namespace DEWalksAPI.Controllers
         {
 
             // Map DTO To Domain Model
-            var regionDomainModel = new Region {
-                Name = updateRegionRequestDto.Name,
-                Code = updateRegionRequestDto.Code,
-                RegionImageUrl = updateRegionRequestDto.RegionImageUrl
-
-            };
+            var regionDomainModel = mapper.Map<Region>(updateRegionRequestDto);
 
             regionDomainModel = await regionRepository.UpdateRegionByIdAsync(Id, regionDomainModel);
 
@@ -111,12 +83,7 @@ namespace DEWalksAPI.Controllers
             }
 
             // Convert Domain Model To DTO
-            var regionDto = new RegionDto {
-                Id = regionDomainModel.Id,
-                Name = regionDomainModel.Name,
-                Code = regionDomainModel.Code,
-                RegionImageUrl = regionDomainModel.RegionImageUrl
-            };
+            var regionDto = mapper.Map<RegionDto>(regionDomainModel);
 
             return Ok(regionDto);
         }
@@ -133,12 +100,7 @@ namespace DEWalksAPI.Controllers
             }
 
             // Map regionModel To DTO
-            var resgionDto = new RegionDto { 
-                Id = regionModel.Id,
-                Name = regionModel.Name,
-                Code = regionModel.Code,
-                RegionImageUrl = regionModel.RegionImageUrl
-            };
+            var resgionDto = mapper.Map<RegionDto>(regionModel);
 
             return Ok(resgionDto);
         }

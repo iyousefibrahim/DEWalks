@@ -1,4 +1,5 @@
 using DEWalksAPI.Data;
+using DEWalksAPI.Mappings;
 using DEWalksAPI.Repositories.Implementations;
 using DEWalksAPI.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -16,6 +17,7 @@ options.UseSqlServer(builder.Configuration.GetConnectionString("DEWalksConnectio
 
 
 builder.Services.AddScoped<IRegionRepository, SQLRegionRepository>();
+builder.Services.AddAutoMapper(typeof(AutoMapperProfiles));
 
 var app = builder.Build();
 
