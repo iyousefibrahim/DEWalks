@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using DEWalksAPI.CustomActionFilters;
 using DEWalksAPI.Data;
 using DEWalksAPI.Models.Domain;
 using DEWalksAPI.Models.DTO;
@@ -53,39 +54,42 @@ namespace DEWalksAPI.Controllers
         }
 
         [HttpPost]
+        [ValidateModel]
         public async Task<IActionResult> CreateRegionAsync([FromBody] AddRegionRequestDto addRegionRequestDto)
         {
-            // Map DTO To Domain Model
-            var regionDomainModel = mapper.Map<Region>(addRegionRequestDto);
 
-            // Save new record
-            regionDomainModel = await regionRepository.CreateRegionAsync(regionDomainModel);
+                // Map DTO To Domain Model
+                var regionDomainModel = mapper.Map<Region>(addRegionRequestDto);
 
-            // Map Domain Model To DTO
-            var regionDto = mapper.Map<RegionDto>(regionDomainModel);
+                // Save new record
+                regionDomainModel = await regionRepository.CreateRegionAsync(regionDomainModel);
 
-            return StatusCode(201, regionDto);
+                // Map Domain Model To DTO
+                var regionDto = mapper.Map<RegionDto>(regionDomainModel);
+
+                return StatusCode(201, regionDto);
         }
 
         [Route("{Id:guid}")]
         [HttpPut]
+        [ValidateModel]
         public async Task<IActionResult> UpdateRegionByIdAsync([FromRoute]Guid Id, [FromBody]UpdateRegionRequestDto updateRegionRequestDto)
         {
 
-            // Map DTO To Domain Model
-            var regionDomainModel = mapper.Map<Region>(updateRegionRequestDto);
+                // Map DTO To Domain Model
+                var regionDomainModel = mapper.Map<Region>(updateRegionRequestDto);
 
-            regionDomainModel = await regionRepository.UpdateRegionByIdAsync(Id, regionDomainModel);
+                regionDomainModel = await regionRepository.UpdateRegionByIdAsync(Id, regionDomainModel);
 
-            if(regionDomainModel == null)
-            {
-                return NotFound();
-            }
+                if (regionDomainModel == null)
+                {
+                    return NotFound();
+                }
 
-            // Convert Domain Model To DTO
-            var regionDto = mapper.Map<RegionDto>(regionDomainModel);
+                // Convert Domain Model To DTO
+                var regionDto = mapper.Map<RegionDto>(regionDomainModel);
 
-            return Ok(regionDto);
+                return Ok(regionDto);
         }
 
         [Route("{Id:guid}")]

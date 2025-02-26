@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using DEWalksAPI.CustomActionFilters;
 using DEWalksAPI.Models.Domain;
 using DEWalksAPI.Models.DTO;
 using DEWalksAPI.Repositories.Interfaces;
@@ -48,13 +49,9 @@ namespace DEWalksAPI.Controllers
         }
 
         [HttpPost]
+        [ValidateModel]
         public async Task<IActionResult> CreateWalkAsync([FromBody] AddWalkRequestDto addWalkRequestDto)
         {
-            if (addWalkRequestDto == null)
-            {
-                return BadRequest();
-            }
-
             var walkDomain = mapper.Map<Walk>(addWalkRequestDto);
 
             walkDomain = await walkRepository.CreateWalkAsync(walkDomain);
@@ -66,6 +63,7 @@ namespace DEWalksAPI.Controllers
 
         [HttpPut]
         [Route("{Id:guid}")]
+        [ValidateModel]
         public async Task<IActionResult> UpdateWalkByIdAsync([FromRoute]Guid Id,[FromBody]UpdateWalkRequestDto updateWalkRequestDto)
         {
             var walkModel = mapper.Map<Walk>(updateWalkRequestDto);
