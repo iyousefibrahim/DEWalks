@@ -3,6 +3,7 @@ using DEWalksAPI.CustomActionFilters;
 using DEWalksAPI.Models.Domain;
 using DEWalksAPI.Models.DTO;
 using DEWalksAPI.Repositories.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -22,6 +23,7 @@ namespace DEWalksAPI.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "Writer,Reader")]
         public async Task<IActionResult> GetAllWalksAsync()
         {
             var walks = await walkRepository.GetAllWalksAsync();
@@ -35,6 +37,7 @@ namespace DEWalksAPI.Controllers
 
         [HttpGet]
         [Route("{Id:guid}")]
+        [Authorize(Roles = "Writer,Reader")]
         public async Task<IActionResult> GetWalkByIdAsync([FromRoute]Guid Id)
         {
             var walkDomain = await walkRepository.GetWalkByIdAsync(Id);
@@ -50,6 +53,7 @@ namespace DEWalksAPI.Controllers
 
         [HttpPost]
         [ValidateModel]
+        [Authorize(Roles = "Writer")]
         public async Task<IActionResult> CreateWalkAsync([FromBody] AddWalkRequestDto addWalkRequestDto)
         {
             var walkDomain = mapper.Map<Walk>(addWalkRequestDto);
@@ -64,6 +68,7 @@ namespace DEWalksAPI.Controllers
         [HttpPut]
         [Route("{Id:guid}")]
         [ValidateModel]
+        [Authorize(Roles = "Writer")]
         public async Task<IActionResult> UpdateWalkByIdAsync([FromRoute]Guid Id,[FromBody]UpdateWalkRequestDto updateWalkRequestDto)
         {
             var walkModel = mapper.Map<Walk>(updateWalkRequestDto);
@@ -80,6 +85,7 @@ namespace DEWalksAPI.Controllers
 
         [HttpDelete]
         [Route("{Id:guid}")]
+        [Authorize(Roles = "Writer")]
         public async Task<IActionResult> DeleteWalkAsync(Guid Id)
         {
             var walkDomain = await walkRepository.DeleteWalkAsync(Id);

@@ -4,6 +4,7 @@ using DEWalksAPI.Data;
 using DEWalksAPI.Models.Domain;
 using DEWalksAPI.Models.DTO;
 using DEWalksAPI.Repositories.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -12,6 +13,7 @@ namespace DEWalksAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class RegionsController : ControllerBase
     {
         private readonly IRegionRepository regionRepository;
@@ -24,6 +26,7 @@ namespace DEWalksAPI.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "Writer,Reader")]
         public async Task<IActionResult> GetAllRegionsAsync()
         {
             var regionDomain = await regionRepository.GetAllRegionsAsync();
@@ -37,6 +40,7 @@ namespace DEWalksAPI.Controllers
 
         [HttpGet]
         [Route("{Id:guid}")]
+        [Authorize(Roles = "Writer,Reader")]
         public async Task<IActionResult> GetRegionByIdAsync([FromRoute]Guid Id)
         {
             // Get Data From DataBase (Domain Model)
@@ -55,6 +59,7 @@ namespace DEWalksAPI.Controllers
 
         [HttpPost]
         [ValidateModel]
+        [Authorize(Roles = "Writer")]
         public async Task<IActionResult> CreateRegionAsync([FromBody] AddRegionRequestDto addRegionRequestDto)
         {
 
@@ -73,6 +78,7 @@ namespace DEWalksAPI.Controllers
         [Route("{Id:guid}")]
         [HttpPut]
         [ValidateModel]
+        [Authorize(Roles = "Writer")]
         public async Task<IActionResult> UpdateRegionByIdAsync([FromRoute]Guid Id, [FromBody]UpdateRegionRequestDto updateRegionRequestDto)
         {
 
@@ -94,6 +100,7 @@ namespace DEWalksAPI.Controllers
 
         [Route("{Id:guid}")]
         [HttpDelete]
+        [Authorize(Roles = "Writer")]
         public async Task<IActionResult> DeleteRegionById([FromRoute] Guid Id)
         {
             var regionModel = await regionRepository.DeleteAsync(Id);
