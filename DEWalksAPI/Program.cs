@@ -3,15 +3,28 @@ using DEWalksAPI.Mappings;
 using DEWalksAPI.Repositories.Implementations;
 using DEWalksAPI.Repositories.Interfaces;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Serilog;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+
+
+// Add Serilog Logger
+var logger = new LoggerConfiguration()
+    .WriteTo.Console()
+    .MinimumLevel.Error()
+    .CreateLogger();
+    //.WriteTo.File("path"); To Write Logging into File
+
+builder.Logging.ClearProviders();
+builder.Logging.AddSerilog(logger);
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -53,6 +66,8 @@ options.UseSqlServer(builder.Configuration.GetConnectionString("DEWalksConnectio
 builder.Services.AddDbContext<DEWalksAuthDbContext>(options =>
 options.UseSqlServer(builder.Configuration.GetConnectionString("DEWalksAuthConnectionString")));
 
+
+// Repositories
 builder.Services.AddScoped<IRegionRepository, SQLRegionRepository>();
 builder.Services.AddScoped<IWalkRepository, SQLWalkRepository>();
 builder.Services.AddAutoMapper(typeof(AutoMapperProfiles));
@@ -98,6 +113,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseMiddleware<ExceptionHandlerMiddleware>();
 app.UseHttpsRedirection();
 
 app.UseAuthentication();
